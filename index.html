@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
 <title>吃茶三千 · 考核前練習工具</title>
 <style>
 :root{
@@ -101,9 +102,26 @@ header.top p{color:var(--gold); font-size:.82rem; margin-top:6px; letter-spacing
 .wrongbook-entry .cnt{float:right; background:#faeae8; color:var(--red); border-radius:10px; padding:1px 8px; font-size:.7rem;}
 .feedback-float{position:fixed; top:18%; left:50%; transform:translateX(-50%); background:rgba(31,77,58,.95); color:#fff; padding:12px 26px; border-radius:30px; font-size:1.05rem; font-weight:700; z-index:99; display:none; letter-spacing:.15em;}
 .notice{background:#fdf6e8; border:1px dashed var(--gold); border-radius:12px; padding:10px 14px; font-size:.8rem; color:#8a7040; margin-top:14px; line-height:1.6; text-align:center;}
+#gate{position:fixed; inset:0; background:var(--green-dark); z-index:999; display:flex; align-items:center; justify-content:center; padding:24px;}
+#gate .box{max-width:340px; width:100%; text-align:center; color:#fff;}
+#gate h2{letter-spacing:.2em; font-size:1.3rem;}
+#gate p{color:var(--gold); font-size:.82rem; margin:10px 0 22px; line-height:1.7;}
+#gate input{width:100%; border:none; border-radius:14px; padding:16px; font-size:1.2rem; text-align:center; letter-spacing:.4em; font-family:inherit; outline:none;}
+#gate input.err{animation:shake .3s; box-shadow:0 0 0 3px var(--red);}
+#gate button{width:100%; margin-top:14px; background:var(--gold); color:var(--green-dark); border:none; border-radius:14px; padding:14px; font-size:1rem; font-weight:700; letter-spacing:.15em; cursor:pointer; font-family:inherit;}
+#gate .hint{font-size:.72rem; color:#8fa89a; margin-top:16px;}
 </style>
 </head>
 <body>
+<div id="gate">
+  <div class="box">
+    <h2>吃茶三千 · 考核前練習</h2>
+    <p>本工具僅供內部夥伴訓練使用<br>請輸入通行碼進入</p>
+    <input type="password" id="gateInput" inputmode="numeric" autocomplete="off" placeholder="通行碼">
+    <button id="gateBtn">進入練習</button>
+    <div class="hint">通行碼請向你的訓練員索取</div>
+  </div>
+</div>
 <header class="top">
   <h1>吃茶三千 · 考核前練習</h1>
   <p>練習模式 — 錯了沒關係，練到熟就好</p>
@@ -1036,6 +1054,29 @@ function endDrill(){
 }
 
 renderHome();
+
+/* ═══════════════ 通行碼閘門（內部使用防護） ═══════════════ */
+(function(){
+  const K=[56,57,57,49]; // 反向字元碼
+  const pass=()=>K.map(c=>String.fromCharCode(c)).reverse().join("");
+  let ok=false;
+  try{ ok = localStorage.getItem("tea3000_gate")==="ok"; }catch(e){}
+  const g=$("gate");
+  if(ok){ g.style.display="none"; return; }
+  const tryEnter=()=>{
+    const v=$("gateInput").value.trim();
+    if(v===pass()){
+      try{ localStorage.setItem("tea3000_gate","ok"); }catch(e){}
+      g.style.display="none";
+    } else {
+      const inp=$("gateInput");
+      inp.classList.remove("err"); void inp.offsetWidth; inp.classList.add("err");
+      inp.value=""; inp.focus();
+    }
+  };
+  $("gateBtn").onclick=tryEnter;
+  $("gateInput").addEventListener("keydown",e=>{ if(e.key==="Enter") tryEnter(); });
+})();
 </script>
 </body>
 </html>
